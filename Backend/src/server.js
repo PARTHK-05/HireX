@@ -6,7 +6,15 @@ import { ENV } from "./lib/env.js";
 import { connectDB } from "./lib/db.js";
 import { inngest, functions } from "./lib/inngest.js";
 
+
 const app = express();
+
+// const allowedOrigins = ENV.CLIENT_URL.split(",");
+const allowedOrigins = ENV.CLIENT_URL
+  ? ENV.CLIENT_URL.split(",")
+  : [];
+
+  console.log(allowedOrigins)
 
 /* =====================
    Middleware
@@ -19,7 +27,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: ENV.CLIENT_URL, // frontend URL
+    origin: allowedOrigins, // frontend URL
     credentials: true,      // allow cookies / auth headers
   })
 );
