@@ -14,7 +14,7 @@ const allowedOrigins = ENV.CLIENT_URL
   ? ENV.CLIENT_URL.split(",")
   : [];
 
-  console.log(allowedOrigins)
+//   console.log(allowedOrigins)
 
 /* =====================
    Middleware
