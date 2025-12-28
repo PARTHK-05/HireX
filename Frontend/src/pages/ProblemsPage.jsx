@@ -13,9 +13,10 @@ function ProblemsPage() {
   const mediumProblemsCount = problems.filter((p) => p.difficulty === "Medium").length;
   const hardProblemsCount = problems.filter((p) => p.difficulty === "Hard").length;
 
-  const { data, isLoading, error } = useActiveSessions();
+  const { data: activeSessions, isLoading, error } = useActiveSessions();
 
-  console.log(data);
+  console.log(activeSessions);
+
 
 
   return (
