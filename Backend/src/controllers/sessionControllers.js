@@ -51,19 +51,24 @@ export async function createSession(req,res){
     }
 }
 
-export async function getActiveSessions(_,res){
+export async function getActiveSessions(_, res) {
     try {
-        const sessions = (await Session.find({status:"active"})
-            .populate("host" , "name profilePic email clerId"))
-            .toSorted({createdAt:-1})
+        const sessions = await Session.find({ status: "active" })
+            .populate("host", "name profilePic email clerkId")
+            .populate("participant", "name profilePic email clerkId")
+            .sort({ createdAt: -1 })
             .limit(20);
 
-        res.status(200).json({sessions})
+        // console.log("hello world");
+
+        res.status(200).json({ sessions });
 
     } catch (error) {
-        
+        console.log("Error in getActiveSessions controller:", error.message);
+        res.status(500).json({ message: "INTERNAL SERVER ERROR" });
     }
 }
+
 
 export async function getMyRecentSession(req,res){
     try {

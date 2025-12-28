@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import { PROBLEMS } from "../data/problems";
 import { ChevronRightIcon, Code2Icon } from "lucide-react";
 import { getDifficultyBadgeClass } from "../lib/utilis.js";
+import { useActiveSessions } from "../hooks/useSessions.js";
 
 function ProblemsPage() {
   const problems = Object.values(PROBLEMS);
@@ -11,6 +12,11 @@ function ProblemsPage() {
   const easyProblemsCount = problems.filter((p) => p.difficulty === "Easy").length;
   const mediumProblemsCount = problems.filter((p) => p.difficulty === "Medium").length;
   const hardProblemsCount = problems.filter((p) => p.difficulty === "Hard").length;
+
+  const { data, isLoading, error } = useActiveSessions();
+
+  console.log(data);
+
 
   return (
     <div className="min-h-screen bg-base-200">

@@ -35,7 +35,7 @@ app.use(cors({
   })
 );
 
-app.use(clerkMiddleware); // this add auth field to request object : req.auth()
+app.use(clerkMiddleware()); // this add auth field to request object : req.auth()
 
 /* =====================
    Inngest Route
@@ -78,7 +78,7 @@ const startServer = async () => {
   try {
     await connectDB();
 
-    app.listen(PORT, () => {
+    app.listen(PORT, "0.0.0.0" , () => {
       console.log(`✅ Server running on port ${PORT}`);
     });
   } catch (error) {
