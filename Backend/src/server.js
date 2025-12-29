@@ -18,11 +18,6 @@ const allowedOrigins = ENV.CLIENT_URL
   ? ENV.CLIENT_URL.split(",")
   : [];
 
-//   console.log(allowedOrigins)
-
-/* =====================
-   Middleware
-===================== */
 
 // Trust proxy (important for Render / Vercel)
 app.set("trust proxy", 1);
@@ -36,6 +31,12 @@ app.use(cors({
 );
 
 app.use(clerkMiddleware()); // this add auth field to request object : req.auth()
+
+app.use((req, res, next) => {
+  console.log("Origin:", req.headers.origin);
+  console.log("Cookies:", req.headers.cookie);
+  next();
+});
 
 /* =====================
    Inngest Route
