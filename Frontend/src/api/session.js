@@ -13,7 +13,7 @@ export const sessionApi = {
     },
 
     getMyRecentSession: async()=>{
-            const response = await axiosInstance.post(`/sessions/my-recent`);
+            const response = await axiosInstance.get(`/sessions/my-recent`);
             return response.data ;
     },
     getSessionById: async(id)=>{
