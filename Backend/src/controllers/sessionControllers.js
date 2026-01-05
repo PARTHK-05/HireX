@@ -1,55 +1,103 @@
 import { chatClient, streamClient } from "../lib/stream.js"
 import Session from "../models/Session.js"
 
-export async function createSession(req,res){
-    try {
-        const {problem , difficulty} = req.body
-        const userId = req.user_id
-        const clerkId = req.user.clerkId 
+export async function createSession(req, res) {
+  try {
+    const { problem, difficulty } = req.body;
 
-        if(!problem || !difficulty){
-            return res.status(400).json({message:"Problem and Difficulty are required"})
-        }
-
-        //generate a unique call id for stream video
-
-        const callId = `session_${Date.now()}_${Math.random().toString(32).substring(7)}`
-
-        const session = await Session.create({
-            problem,
-            difficulty,
-            host:userId,
-            callId,
-        })
-
-        await streamClient.video.call("default",callId).getOrCreate({
-            data:{
-                created_by_id:clerkId,
-                custom:{
-                    problem , 
-                    difficulty , 
-                    sessionId:session._id.toString()
-                }
-            },
-
-        })
-
-        const channel =  chatClient.channel("messaging",callId , {
-            name:`${problem} Session`,
-            created_by_id:clerkId,
-            members:{clerkId}
-        })
-
-        await channel.create()
-
-        res.status(201).JSON({
-           session 
-        })
-    } catch (error) {
-        console.log("Error in Createsession controller:",error.message);
-        res.status(500).JSON({message : "iNTERNAL SERVER ERROR"})
+    if (!problem || !difficulty) {
+      return res.status(400).json({ message: "Problem and Difficulty are required" });
     }
+
+    const userId = req.user._id;
+    const clerkId = req.user.clerkId;
+
+    const callId = `session_${Date.now()}_${Math.random()
+      .toString(32)
+      .substring(7)}`;
+
+    const session = await Session.create({
+      problem,
+      difficulty,
+      host: userId,
+      callId,
+    });
+
+    await streamClient.video.call("default", callId).getOrCreate({
+      data: {
+        created_by_id: clerkId,
+        custom: {
+          problem,
+          difficulty,
+          sessionId: session._id.toString(),
+        },
+      },
+    });
+
+    const channel = chatClient.channel("messaging", callId, {
+      name: `${problem} Session`,
+      created_by_id: clerkId,
+      members: [clerkId],
+    });
+
+    await channel.create();
+
+    res.status(201).json({ session });
+  } catch (error) {
+    console.error("Error in createSession controller:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 }
+
+
+// export async function createSession(req, res) {
+//   try {
+//     const { problem, difficulty } = req.body;
+
+//     if (!problem || !difficulty) {
+//       return res.status(400).json({ message: "Problem and Difficulty are required" });
+//     }
+
+//     const userId = req.user._id;
+//     const clerkId = req.user.clerkId;
+
+//     const callId = `session_${Date.now()}_${Math.random()
+//       .toString(32)
+//       .substring(7)}`;
+
+//     const session = await Session.create({
+//       problem,
+//       difficulty,
+//       host: userId,
+//       callId,
+//     });
+
+//     await streamClient.video.call("default", callId).getOrCreate({
+//       data: {
+//         created_by_id: clerkId,
+//         custom: {
+//           problem,
+//           difficulty,
+//           sessionId: session._id.toString(),
+//         },
+//       },
+//     });
+
+//     const channel = chatClient.channel("messaging", callId, {
+//       name: `${problem} Session`,
+//       created_by_id: clerkId,
+//       members: [clerkId],
+//     });
+
+//     await channel.create();
+
+//     res.status(201).json({ session });
+//   } catch (error) {
+//     console.error("Error in createSession controller:", error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// }
+
 
 export async function getActiveSessions(_, res) {
     try {
@@ -154,7 +202,7 @@ export async function endSession(req,res){
         const {id} = req.params
         const userId = req.user._id
 
-        const session  = Session.findById(id);
+        const session  = await Session.findById(id);
 
         if(!session)  return res.status(404).json({message:"Session not found"})
 

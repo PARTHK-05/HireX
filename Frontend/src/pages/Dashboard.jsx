@@ -26,21 +26,26 @@ const Dashboard = () => {
    console.log(recentSessionsData)
 
 
+  const handleCreateRoom = () => {
+    if (!roomConfig.problem || !roomConfig.difficulty) {
+      toast.error("Please select a problem");
+      return;
+    }
 
-  const handleCreateRoom = () =>{
-    if(!roomConfig.problem || !roomConfig.difficulty){
-      createSessionMutation.mutate({
-        problem:roomConfig.problem,
-        difficulty:roomConfig.difficulty.toLowerCase(),
-      },{
-        onSuccess:(data)=>{
+    createSessionMutation.mutate(
+      {
+        problem: roomConfig.problem,
+        difficulty: roomConfig.difficulty.toLowerCase(),
+      },
+      {
+        onSuccess: (data) => {
           setShowCreateModal(false);
           navigate(`/session/${data.session._id}`);
-        }
+        },
       }
-    )
-    }
-  }
+    );
+  };
+
     const activeSessions = activeSessionsData?.sessions || [];
   const recentSessions = recentSessionsData?.sessions || [];
 

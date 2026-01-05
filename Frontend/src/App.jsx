@@ -1,14 +1,12 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useUser } from '@clerk/clerk-react'
+import { Toaster } from 'react-hot-toast'
+import { Navigate, Route, Routes } from "react-router"
 import './index.css'
-import { SignedIn, SignedOut, SignInButton, SignOutButton, UserButton, useUser } from '@clerk/clerk-react'
-import {Routes , Route, Navigate} from "react-router"
-import HomePage from './pages/HomePage'
-import ProblemsPage from './pages/ProblemsPage'
-import {Toaster} from 'react-hot-toast'
 import Dashboard from './pages/Dashboard'
+import HomePage from './pages/HomePage'
 import ProblemPage from './pages/ProblemPage'
+import ProblemsPage from './pages/ProblemsPage'
+import SessionPage from './pages/SessionPage'
 
 function App() {
   const {isSignedIn , isLoaded}=useUser()
@@ -19,9 +17,9 @@ function App() {
       <Routes>
         <Route path='/' element={!isSignedIn ? <HomePage/> : <Navigate to={"/dashboard"}/> } />
         <Route path='/dashboard' element={isSignedIn ? <Dashboard/> : <Navigate to={"/"}/> } />
-
         <Route path='/problems' element={ isSignedIn ?  <ProblemsPage/> : <Navigate to={"/"}/>} />
         <Route path='/problem/:id' element={ isSignedIn ?  <ProblemPage/> : <Navigate to={"/"}/>} />
+        <Route path='/session/:id' element={ isSignedIn ?  <SessionPage /> : <Navigate to={"/"}/>} />
 
       </Routes>
       <Toaster

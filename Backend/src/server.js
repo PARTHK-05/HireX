@@ -32,11 +32,6 @@ app.use(cors({
 
 app.use(clerkMiddleware()); // this add auth field to request object : req.auth()
 
-app.use((req, res, next) => {
-  console.log("Origin:", req.headers.origin);
-  console.log("Cookies:", req.headers.cookie);
-  next();
-});
 
 /* =====================
    Inngest Route
