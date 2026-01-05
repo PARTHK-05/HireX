@@ -22,8 +22,6 @@ const Dashboard = () => {
    const {data : activeSessionsData, isLoading:loadingActiveSessions}  = useActiveSessions();
    const {data : recentSessionsData, isLoading:loadingRecentSessions}  = useMyRecentSessions();
 
-   console.log(activeSessionsData)
-   console.log(recentSessionsData)
 
 
   const handleCreateRoom = () => {

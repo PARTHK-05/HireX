@@ -162,8 +162,8 @@ export async function getSessionById(req,res){
 export async function joinSession(req,res){
     try {
         const {id} = req.params;
-        const userId = req.user_id
-        const clerkId = req.clerkId
+        const userId = req.user._id
+        const clerkId = req.user.clerkId
 
         const session = await Session.findById(id)
 
@@ -187,7 +187,7 @@ export async function joinSession(req,res){
         await session.save();
 
         const channel = chatClient.channel("messaging",session.callId)
-        await channel.addMembers({clerkId})
+        await channel.addMembers([clerkId])
 
         res.status(200).json({session})
 
