@@ -26,7 +26,7 @@ const allowedOrigins = ENV.CLIENT_URL
 
 app.use(express.json());
 
-// ✅ CORS (THIS HANDLES PREFLIGHT AUTOMATICALLY)
+//  CORS (THIS HANDLES PREFLIGHT AUTOMATICALLY)
 app.use(cors({
   origin: (origin, callback) => {
     // Allow server-to-server / Postman / Vercel internal
