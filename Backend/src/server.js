@@ -1,57 +1,71 @@
 import express from "express";
 import cors from "cors";
 import { serve } from "inngest/express";
+import { clerkMiddleware } from "@clerk/express";
 
 import { ENV } from "./lib/env.js";
 import { connectDB } from "./lib/db.js";
 import { inngest, functions } from "./lib/inngest.js";
-import { clerkMiddleware } from '@clerk/express'
-import { protectRoute } from "./middleware/protectRoute.js";
-import chatRoutes from "./routes/chatRoutes.js"
-import sessionRoutes from "./routes/sessionRoutes.js"
 
+import chatRoutes from "./routes/chatRoutes.js";
+import sessionRoutes from "./routes/sessionRoutes.js";
 
 const app = express();
 
-// const allowedOrigins = ENV.CLIENT_URL.split(",");
+/* =====================
+   CORS CONFIG
+===================== */
+
 const allowedOrigins = ENV.CLIENT_URL
-  ? ENV.CLIENT_URL.split(",")
+  ? ENV.CLIENT_URL.split(",").map(o => o.trim())
   : [];
 
-
-// Trust proxy (important for Render / Vercel)
-app.set("trust proxy", 1);
+/* =====================
+   MIDDLEWARE
+===================== */
 
 app.use(express.json());
 
+// ✅ CORS (THIS HANDLES PREFLIGHT AUTOMATICALLY)
 app.use(cors({
-    origin: allowedOrigins, // frontend URL
-    credentials: true,      // allow cookies / auth headers
-  })
-);
+  origin: (origin, callback) => {
+    // Allow server-to-server / Postman / Vercel internal
+    if (!origin) return callback(null, true);
 
-app.use(clerkMiddleware()); // this add auth field to request object : req.auth()
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
 
+    console.error("❌ Blocked by CORS:", origin);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+}));
 
 /* =====================
-   Inngest Route
+   AUTH
 ===================== */
-app.use("/api/inngest",
+app.use(clerkMiddleware());
+
+/* =====================
+   INNGEST
+===================== */
+app.use(
+  "/api/inngest",
   serve({
     client: inngest,
     functions,
   })
 );
 
-app.use("/api/chat" , chatRoutes)
-
-app.use("/api/sessions" , sessionRoutes)
-
-
-
+/* =====================
+   ROUTES
+===================== */
+app.use("/api/chat", chatRoutes);
+app.use("/api/sessions", sessionRoutes);
 
 /* =====================
-   Health Check
+   HEALTH
 ===================== */
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -60,27 +74,16 @@ app.get("/", (req, res) => {
   });
 });
 
-app.get("/health" , (req,res)=>{
-  
-  res.status(200).json({msg:"api is up and running "});
-})
+app.get("/health", (req, res) => {
+  res.status(200).json({ msg: "api is up and running" });
+});
 
 /* =====================
-   Start Server
+   DB INIT
 ===================== */
-const PORT = ENV.PORT || process.env.PORT || 3000;
+connectDB();
 
-const startServer = async () => {
-  try {
-    await connectDB();
-
-    app.listen(PORT, "0.0.0.0" , () => {
-      console.log(`✅ Server running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error("❌ Error starting the server:", error);
-    process.exit(1);
-  }
-};
-
-startServer();
+/* =====================
+   EXPORT (Vercel)
+===================== */
+export default app;
