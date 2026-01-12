@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { getToken } from '@clerk/clerk-react'
 
 const axiosInstance = axios.create({
     baseURL:import.meta.env.VITE_API_URL,
@@ -10,9 +9,12 @@ const axiosInstance = axios.create({
 // Add request interceptor to include Clerk token
 axiosInstance.interceptors.request.use(async (config) => {
     try {
-        const token = await getToken()
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`
+        const clerk = window.Clerk
+        if (clerk && clerk.session) {
+            const token = await clerk.session.getToken()
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`
+            }
         }
     } catch (error) {
         console.error('Error getting token:', error)
