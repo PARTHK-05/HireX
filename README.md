@@ -1,4 +1,4 @@
-# Interview Prep Platform
+# HireX
 
 A comprehensive web-based platform designed to facilitate mock coding interviews, enabling users to practice technical interviews in a simulated environment with real-time collaboration features.
 
